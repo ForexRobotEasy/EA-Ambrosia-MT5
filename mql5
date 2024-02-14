@@ -1,0 +1,170 @@
+
+// EA Ambrosia MT5
+// Developer's Site: forexroboteasy.com
+// Development: Forex Robot Easy Team
+
+// Include necessary libraries and indicators
+#include <Trade\Trade.mqh>
+#include <Indicators\InstitutionalLevels.mqh>
+#include <Indicators\CentralPivotTool.mqh>
+
+// Declare global variables
+CTrade trade;
+CInstitutionalLevels institutionalLevels;
+CCentralPivotTool centralPivotTool;
+
+// Initialize the EA
+int OnInit()
+{
+    // Initialize the trade module
+    trade.Init();
+
+    // Initialize the Institutional Levels Indicator
+    institutionalLevels.Init();
+
+    // Initialize the Central Pivot Tool
+    centralPivotTool.Init();
+
+    return(INIT_SUCCEEDED);
+}
+
+// Calculate new Pivot and Fibonacci levels
+void CalculateLevels()
+{
+    // Get the previous day's price action
+    double previousDayHigh = iHigh(NULL, PERIOD_D1, 1);
+    double previousDayLow = iLow(NULL, PERIOD_D1, 1);
+    double previousDayClose = iClose(NULL, PERIOD_D1, 1);
+
+    // Calculate new Pivot levels
+    double pivotLevel = centralPivotTool.CalculatePivotLevel(previousDayHigh, previousDayLow, previousDayClose);
+    double supportLevel = centralPivotTool.CalculateSupportLevel(pivotLevel, previousDayHigh, previousDayLow);
+    double resistanceLevel = centralPivotTool.CalculateResistanceLevel(pivotLevel, previousDayHigh, previousDayLow);
+
+    // Calculate new Fibonacci levels
+    double fibLevel1 = institutionalLevels.CalculateFibonacciLevel(previousDayLow, previousDayHigh, 0.382);
+    double fibLevel2 = institutionalLevels.CalculateFibonacciLevel(previousDayLow, previousDayHigh, 0.618);
+    double fibLevel3 = institutionalLevels.CalculateFibonacciLevel(previousDayLow, previousDayHigh, 1.0);
+
+    // Display the calculated levels on the chart
+    Comment('Pivot Level: ', pivotLevel);
+    Comment('Support Level: ', supportLevel);
+    Comment('Resistance Level: ', resistanceLevel);
+    Comment('Fibonacci Level 1: ', fibLevel1);
+    Comment('Fibonacci Level 2: ', fibLevel2);
+    Comment('Fibonacci Level 3: ', fibLevel3);
+}
+
+// Monitor Institutional Levels for significant trading levels
+void MonitorLevels()
+{
+    // Get the current price
+    double currentPrice = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
+
+    // Check if current price is above or below Institutional Levels
+    if (currentPrice > institutionalLevels.GetLevel(0))
+    {
+        // Current price is above Institutional Levels
+        Comment('Current price is above Institutional Levels');
+    }
+    else if (currentPrice < institutionalLevels.GetLevel(0))
+    {
+        // Current price is below Institutional Levels
+        Comment('Current price is below Institutional Levels');
+    }
+    else
+    {
+        // Current price is at Institutional Levels
+        Comment('Current price is at Institutional Levels');
+    }
+}
+
+// Execute trades based on selected entry options and combinations
+void ExecuteTrades()
+{
+    // Define entry options and combinations
+    string entryOptions[26] = {
+        'Entry Option 1',
+        'Entry Option 2',
+        'Entry Option 3',
+        // ... add more entry options ...
+        'Entry Option 26'
+    };
+
+    // Get the user's selected entry option
+    int selectedEntryOption = 5; // Assume user selects entry option 5
+
+    // Execute trade based on selected entry option
+    trade.Buy(0.01, _Symbol, selectedEntryOption, 0, 0, 0, 'EA Ambrosia MT5');
+}
+
+// Manage risk with stop-loss and take-profit orders
+void ManageRisk()
+{
+    // Set stop-loss and take-profit levels
+    double stopLossLevel = institutionalLevels.GetLevel(0) - 50 * _Point;
+    double takeProfitLevel = institutionalLevels.GetLevel(0) + 100 * _Point;
+
+    // Place stop-loss and take-profit orders for open trades
+    trade.PositionModifyStopLoss(0, stopLossLevel);
+    trade.PositionModifyTakeProfit(0, takeProfitLevel);
+}
+
+// Optimize code for performance and resource usage
+void OptimizeCode()
+{
+    // Perform code optimization here
+    // ...
+}
+
+// Test the code for accuracy and reliability
+void TestCode()
+{
+    // Perform code testing here
+    // ...
+}
+
+// Document the code for future maintenance and updates
+void DocumentCode()
+{
+    // Add necessary comments and documentation here
+    // ...
+}
+
+// Handle the deinitialization of the EA
+void OnDeinit(const int reason)
+{
+    // Deinitialize the trade module
+    trade.Deinit();
+
+    // Deinitialize the Institutional Levels Indicator
+    institutionalLevels.Deinit();
+
+    // Deinitialize the Central Pivot Tool
+    centralPivotTool.Deinit();
+}
+
+// The main function for the EA
+void OnTick()
+{
+    // Calculate new levels daily
+    CalculateLevels();
+
+    // Monitor Institutional Levels for trading opportunities
+    MonitorLevels();
+
+    // Execute trades based on selected entry options
+    ExecuteTrades();
+
+    // Manage risk with stop-loss and take-profit orders
+    ManageRisk();
+
+    // Optimize code for performance and resource usage
+    OptimizeCode();
+
+    // Test the code for accuracy and reliability
+    TestCode();
+
+    // Document the code for future maintenance and updates
+    DocumentCode();
+}
